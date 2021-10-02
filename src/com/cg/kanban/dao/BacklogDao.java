@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.cg.kanban.model.Backlog;
 import com.cg.kanban.model.Project;
+import com.cg.kanban.model.ProjectTask;
 import com.cg.kanban.model.User;
 import com.cg.kanban.util.Dbutil;
 
@@ -44,7 +45,7 @@ public class BacklogDao {
 	{
 		con=Dbutil.getConnection();
 		Statement stmt = con.createStatement();
-		 ResultSet rs = stmt.executeQuery("select * from (backlog_tbl b INNER JOIN project_tbl p ON b.project_identifier=p.project_identifier)");
+		 ResultSet rs = stmt.executeQuery("select * from ((backlog_tbl b INNER JOIN project_tbl p ON b.project_identifier=p.project_identifier) INNER JOIN project_task_tbl pt ON b.project_identifier=pt.project_identifier)");
 		//create table backlog_tbl(backlog_id number,pt_sequence varchar(20),project_identifier varchar(20),primary key(backlog_id ),constraint fk_backlog_project foreign key (project_identifier) references project_tbl(project_identifier));
 		 //SELECT * FROM (backlog_tbl b INNER JOIN project_tbl p ON b.project_identifier=p.project_identifier)
 		  ArrayList<Backlog> backlogList = new ArrayList<>();
@@ -69,6 +70,20 @@ public class BacklogDao {
 		        project.setCreatedAt(rs.getDate("project_created_at").toString());
 		        project.setUpdatedAt(rs.getDate("project_updated_at").toString());
 		        backlog.setProject(project);
+		        
+		        ProjectTask projectTask=new ProjectTask();
+		        projectTask.setId(rs.getInt("task_id"));
+		        projectTask.setProjectSequence(rs.getString("project_sequence"));
+		        projectTask.setSummary(rs.getString("task_summary"));
+		        projectTask.setAcceptanceCriteria(rs.getString("task_acceptance_criteria"));
+		        projectTask.setStatus(rs.getString("task_status"));
+		        projectTask.setPriority(rs.getString("task_priority"));
+		        projectTask.setDueDate(rs.getDate("task_due_date").toString());
+		        projectTask.setProjectIdentifier(rs.getString("project_identifier"));
+		        projectTask.setCreatedAt(rs.getDate("task_created_at").toString());
+		        projectTask.setUpdatedAt(rs.getDate("task_updated_at").toString());
+		        
+		        backlog.setProjectTasks(projectTask);
 		        
 		        backlogList.add(backlog);
 		  
